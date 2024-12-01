@@ -36,8 +36,9 @@ class Camera:
 
   def ray_color(self, r, world):
     rec = HitRecord()
-    if (world.hit(r, Interval(0, float('inf')), rec)):  
-      return 0.5 * (rec.normal + Color(1, 1, 1))
+    if (world.hit(r, Interval(0, float('inf')), rec)): 
+      direction = Vec3.random_on_hemisphere(rec.normal) 
+      return 0.5 * self.ray_color(Ray(rec.p, direction), world)
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)

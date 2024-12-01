@@ -1,5 +1,6 @@
 import math
-
+import random
+from utilities import random_range
 class Vec3:
     def __init__(self, e0=0, e1=0, e2=0):
         self.e = [e0, e1, e2]
@@ -61,6 +62,14 @@ class Vec3:
     def length_squared(self):
         return self.e[0]**2 + self.e[1]**2 + self.e[2]**2
 
+    @staticmethod
+    def random():
+        return Vec3(random.random(), random.random(), random.random())
+
+    @staticmethod
+    def random_range(min, max):
+        return Vec3(random_range(min, max), random_range(min, max), random_range(min, max))
+
 # Vector Utility Functions
 
     def vec3_add(u, v):
@@ -88,6 +97,20 @@ class Vec3:
     
     def unit_vector(v):
         return Vec3.vec3_div_scalar(v, v.length())
+
+    def random_unit_vector():
+        while True:
+            p = Vec3.random_range(-1, 1)
+            lensq = p.length_squared()
+            if 1e-160 < lensq <= 1.0:
+                return Vec3.vec3_div_scalar(p, math.sqrt(lensq))
+
+    def random_on_hemisphere(normal):
+        on_unit_sphere = Vec3.random_unit_vector()
+        if Vec3.dot(on_unit_sphere, normal) > 0.0:
+            return on_unit_sphere
+        else:
+            return -on_unit_sphere
 
 # Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
 Point3 = Vec3

@@ -4,7 +4,7 @@ from HittableList import HittableList
 from Sphere import Sphere
 from Camera import Camera
 
-filename = "image6.ppm"
+filename = "image7.ppm"
 
 # World
 world = HittableList()
