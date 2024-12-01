@@ -3,7 +3,7 @@ from Vec3 import Color, Vec3, Point3
 from color import write_color
 from Ray import Ray
 
-filename = "image2.ppm"
+filename = "image3.ppm"
 aspect_ratio = 16.0 / 9.0
 image_width = 400
 # Calcualte image height and ensure it is at least 1
@@ -55,7 +55,17 @@ def render(file):
   file.close()
   print("Done.\n")
 
+def hit_sphere(center, radius, r):
+  oc = center - r.origin()
+  a = Vec3.dot(r.direction(), r.direction())
+  b = -2.0 * Vec3.dot(r.direction(), oc)
+  c = Vec3.dot(oc, oc) - radius*radius
+  discriminant = b*b - 4*a*c
+  return (discriminant >= 0)
+
 def ray_color(r):
+  if (hit_sphere(Point3(0,0,-1), 0.5, r)):
+    return Color(1, 0, 0)
   unit_direction = Vec3.unit_vector(r.direction())
   a = 0.5 * (unit_direction.y() + 1.0)
   return ((1.0 - a) * Color(1.0, 1.0, 1.0)) + (a*Color(0.5, 0.7, 1.0))
