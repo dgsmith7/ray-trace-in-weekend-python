@@ -7,10 +7,11 @@ import random
 class Camera:
 
   def __init__(self):
-    self.aspect_ratio = 16.0 / 9.0
-    self.image_width = 400
-    self.samples_per_pixel = 10
-    self.pixel_samples_scale = 1.0 / self.samples_per_pixel
+    self.aspect_ratio = 16.0 / 9.0 # Ratio of image width over height
+    self.image_width = 400 # Rendered image width in pixel count
+    self.samples_per_pixel = 100 # Count of random samples for each pixel
+    self.pixel_samples_scale = 1.0 / self.samples_per_pixel # Divisor for ac\veraging samples
+    self.max_depth = 50 #Maximum number of ray bounces into scene
 
   def render(self, file, world):
     self.initialize()
@@ -23,22 +24,20 @@ class Camera:
       txt = f"Scanlines remaining: {lines}"
       print(txt)
       for i in range(self.image_width):
-        # pixel_center = self.pixel00_loc + (i * self.pixel_delta_u) + (j * self.pixel_delta_v)
-        # ray_direction = pixel_center - self.center
-        # r = Ray(self.center, ray_direction)
-        # pixel_color = self.ray_color(r, world)
-        # write_color(file, pixel_color)
         pixel_color = Color(0,0,0)
         for sample in range(self.samples_per_pixel):
           r = self.get_ray(i, j)
-          pixel_color += self.ray_color(r, world)
+          pixel_color += self.ray_color(r, self.max_depth, world)
         write_color(file, self.pixel_samples_scale * pixel_color)
 
-  def ray_color(self, r, world):
+  def ray_color(self, r, depth, world):
+    # If we've exceeded the ray bounce limit, no more light is gathered.
+    if (depth <= 0):
+      return Color(0,0,0)
     rec = HitRecord()
     if (world.hit(r, Interval(0, float('inf')), rec)): 
       direction = Vec3.random_on_hemisphere(rec.normal) 
-      return 0.5 * self.ray_color(Ray(rec.p, direction), world)
+      return 0.5 * self.ray_color(Ray(rec.p, direction), depth - 1, world)
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)
