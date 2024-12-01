@@ -3,8 +3,11 @@ from Vec3 import Color, Vec3, Point3
 from color import write_color
 from Ray import Ray
 import math 
+from Hittable import HitRecord
+from HittableList import HittableList
+from Sphere import Sphere
 
-filename = "image4.ppm"
+filename = "image5.ppm"
 aspect_ratio = 16.0 / 9.0
 image_width = 400
 # Calcualte image height and ensure it is at least 1
@@ -13,6 +16,10 @@ if (image_height < 1):
   image_height = 1
 else:
   image_height = image_height
+# World
+world = HittableList()
+world.add(Sphere(Point3(0, 0, -1), 0.5))
+world.add(Sphere(Point3(0, -100.5, -1), 100))
 # Camera
 focal_length = 1.0
 viewport_height = 2.0
@@ -51,28 +58,27 @@ def render(file):
       pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v)
       ray_direction = pixel_center - camera_center
       r = Ray(camera_center, ray_direction)
-      pixel_color = ray_color(r)
+      pixel_color = ray_color(r, world)
       write_color(file, pixel_color)
   file.close()
   print("Done.\n")
 
 def hit_sphere(center, radius, r):
   oc = center - r.origin()
-  a = Vec3.dot(r.direction(), r.direction())
-  b = -2.0 * Vec3.dot(r.direction(), oc)
-  c = Vec3.dot(oc, oc) - radius * radius
-  discriminant = b * b - 4 * a * c
+  a = r.direction().length_squared()
+  h = Vec3.dot(r.direction(), oc)
+  c = oc.length_squared() - radius * radius
+  discriminant = h * h - a * c
   if (discriminant < 0):
     return -1.0
   else:
-    return (-b - math.sqrt(discriminant)) / (2.0 * a)
+    return (h - math.sqrt(discriminant)) / a
 
-def ray_color(r):
-  t = hit_sphere(Point3(0, 0, -1), 0.5, r)
-  if (t > 0.0):
-    N = Vec3.unit_vector(r.at(t) - Vec3(0, 0, -1))
-    return 0.5 * Color(N.x() + 1, N.y() + 1, N.z() + 1);
-  
+def ray_color(r, world):
+  rec = HitRecord()
+  if (world.hit(r, 0, float('inf'), rec)):  
+    return 0.5 * (rec.normal + Color(1, 1, 1))
+
   unit_direction = Vec3.unit_vector(r.direction())
   a = 0.5 * (unit_direction.y() + 1.0)
   return ((1.0 - a) * Color(1.0, 1.0, 1.0)) + (a*Color(0.5, 0.7, 1.0))
