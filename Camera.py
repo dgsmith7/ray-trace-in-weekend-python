@@ -35,8 +35,9 @@ class Camera:
     if (depth <= 0):
       return Color(0,0,0)
     rec = HitRecord()
-    if (world.hit(r, Interval(0, float('inf')), rec)): 
-      direction = Vec3.random_on_hemisphere(rec.normal) 
+    if (world.hit(r, Interval(0.001, float('inf')), rec)): 
+#      direction = Vec3.random_on_hemisphere(rec.normal) 
+      direction = rec.normal + Vec3.random_unit_vector()
       return 0.5 * self.ray_color(Ray(rec.p, direction), depth - 1, world)
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
