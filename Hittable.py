@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from Vec3 import Point3, Vec3
 from Ray import Ray
+from Interval import Interval
 
 class HitRecord:
     def __init__(self):
@@ -20,5 +21,5 @@ class HitRecord:
     
 class Hittable(ABC):
     @abstractmethod
-    def hit(self, r: Ray, ray_tmin: float, ray_tmax: float, rec: HitRecord) -> bool:
+    def hit(self, r: Ray, ray_t: Interval, rec: HitRecord) -> bool:
         pass
