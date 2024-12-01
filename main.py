@@ -1,14 +1,36 @@
 import os
 from Vec3 import Color, Vec3, Point3
 from color import write_color
+from Ray import Ray
 
-filename = "image1.ppm"
-image_height = 256
-image_width = 256
+filename = "image2.ppm"
+aspect_ratio = 16.0 / 9.0
+image_width = 400
+# Calcualte image height and ensure it is at least 1
+image_height = int(image_width / aspect_ratio)
+if (image_height < 1):
+  image_height = 1
+else:
+  image_height = image_height
+# Camera
+focal_length = 1.0
+viewport_height = 2.0
+viewport_width = viewport_height * (image_width/image_height)
+camera_center = Point3(0, 0, 0)
+# Calculate Vectors across the horizontal and down the vertical viewport edges.
+viewport_u = Vec3(viewport_width, 0, 0)
+viewport_v = Vec3(0, -viewport_height, 0)
+# Calculate the horizontal and vertical delta vectors from pixel to pixel.
+pixel_delta_u = viewport_u / image_width
+pixel_delta_v = viewport_v / image_height
+# Calculate the location of the upper left pixel.
+viewport_upper_left = camera_center - Vec3(0, 0, focal_length) - (viewport_u/2) - (viewport_v/2)
+pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v)
 
 def main():
+  # Render and write image to file
   f = openNewImageFile()
-  render(f)
+  render(f, )
 
 def openNewImageFile():
   if os.path.exists(filename):
@@ -25,9 +47,17 @@ def render(file):
     txt = f"Scanlines remaining: {lines}"
     print(txt)
     for i in range(image_width):
-      pixel_color = Color(i/(image_width-1), j/(image_height-1), 0)
+      pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v)
+      ray_direction = pixel_center - camera_center
+      r = Ray(camera_center, ray_direction)
+      pixel_color = ray_color(r)
       write_color(file, pixel_color)
   file.close()
   print("Done.\n")
+
+def ray_color(r):
+  unit_direction = Vec3.unit_vector(r.direction())
+  a = 0.5 * (unit_direction.y() + 1.0)
+  return ((1.0 - a) * Color(1.0, 1.0, 1.0)) + (a*Color(0.5, 0.7, 1.0))
 
 main()
