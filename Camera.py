@@ -39,8 +39,8 @@ class Camera:
         hit, scattered, attenuation = rec.mat.scatter(r, rec)
         if depth < 50 and hit:
             return attenuation * self.ray_color(scattered, depth + 1, world)
-        # else:
-        #     return Color(0,0,0)  # Black if ray doesn't scatter
+        else:
+            return Color(0,0,0)  # Black if ray doesn't scatter
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)

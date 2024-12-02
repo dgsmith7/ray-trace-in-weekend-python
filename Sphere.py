@@ -7,7 +7,7 @@ from Interval import Interval
 from Material import Material#
 
 class Sphere(Hittable):
-    def __init__(self, center: Point3, radius: float, mat: Material):#
+    def __init__(self, center: Point3, radius: float, mat: Material):
     # def __init__(self, center: Point3, radius: float):
         self.center = center
         self.radius = max(0, radius)
