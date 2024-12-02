@@ -1,7 +1,5 @@
-from abc import ABC, abstractmethod
 from Vec3 import Point3, Vec3
 from Ray import Ray
-from Interval import Interval
 from Material import Material
 
 class HitRecord:
@@ -11,6 +9,7 @@ class HitRecord:
         self.t = 0.0
         self.front_face = False
         self.mat = Material() #
+        #self.mat = None ##
 
     def set_face_normal(self, r, outward_normal):
         # Sets the hit record normal vector.
@@ -20,8 +19,3 @@ class HitRecord:
             self.normal = -outward_normal
         else: 
             self.normal = outward_normal
-            
-class Hittable(ABC):
-    @abstractmethod
-    def hit(self, r: Ray, ray_t: Interval, rec: HitRecord) -> bool:
-        pass

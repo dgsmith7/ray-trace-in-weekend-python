@@ -62,6 +62,10 @@ class Vec3:
     def length_squared(self):
         return self.e[0]**2 + self.e[1]**2 + self.e[2]**2
 
+    def near_zero(self):
+        s = 1e-8
+        return (abs(self.e[0]) < s) and (abs(self.e[1]) < s) and (abs(self.e[2]) < s)
+
     @staticmethod
     def random():
         return Vec3(random.random(), random.random(), random.random())
@@ -85,11 +89,13 @@ class Vec3:
         return Vec3(t * v.e[0], t * v.e[1], t * v.e[2])
     
     def vec3_div_scalar(v, t):
+        if (t == 0):
+            t = 1e-8
         return Vec3(v.e[0] / t, v.e[1] / t, v.e[2] / t)
     
     def dot(u, v):
         return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]
-    
+
     def cross(u, v):
         return Vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
                     u.e[2] * v.e[0] - u.e[0] * v.e[2],
@@ -112,6 +118,11 @@ class Vec3:
         else:
             return -on_unit_sphere
 
+    def reflect(v, n):
+        return Vec3.vec3_sub(v, Vec3.vec3_mul_scalar(2 * Vec3.dot(v, n), n))
+        #return v - 2*Vec3.dot(v,n)*n
+        #return v - n * ((v[0] * n[0] + v[1] * n[1] + v[2] * n[2] ) * 2)
+    
 # Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
 Point3 = Vec3
 

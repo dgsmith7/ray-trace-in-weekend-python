@@ -18,7 +18,6 @@ class HittableList(Hittable):
         temp_rec = HitRecord()
         hit_anything = False
         closest_so_far = ray_t.max
-
         for obj in self.objects:
             if obj.hit(r, Interval(ray_t.min, closest_so_far), temp_rec):
                 hit_anything = True
@@ -27,5 +26,5 @@ class HittableList(Hittable):
                 rec.p = temp_rec.p
                 rec.normal = temp_rec.normal
                 rec.front_face = temp_rec.front_face
-
+                rec.mat = temp_rec.mat
         return hit_anything

@@ -11,7 +11,7 @@ class Camera:
     self.image_width = 400 # Rendered image width in pixel count
     self.samples_per_pixel = 100 # Count of random samples for each pixel
     self.pixel_samples_scale = 1.0 / self.samples_per_pixel # Divisor for ac\veraging samples
-    self.max_depth = 50 #Maximum number of ray bounces into scene
+    self.max_depth = 10 #Maximum number of ray bounces into scene.  Keep below 48.
 
   def render(self, file, world):
     self.initialize()
@@ -36,8 +36,11 @@ class Camera:
       return Color(0,0,0)
     rec = HitRecord()
     if (world.hit(r, Interval(0.001, float('inf')), rec)): 
-      direction = rec.normal + Vec3.random_unit_vector()
-      return 0.5 * self.ray_color(Ray(rec.p, direction), depth - 1, world)
+        hit, scattered, attenuation = rec.mat.scatter(r, rec)
+        if depth < 50 and hit:
+            return attenuation * self.ray_color(scattered, depth + 1, world)
+        # else:
+        #     return Color(0,0,0)  # Black if ray doesn't scatter
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)
