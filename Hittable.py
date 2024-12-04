@@ -10,16 +10,13 @@ class HitRecord:
         self.normal = Vec3()
         self.t = 0.0
         self.front_face = False
-        self.mat = Material()
+        self.mat = None#Material()
 
     def set_face_normal(self, r, outward_normal):
         # Sets the hit record normal vector.
         # NOTE: the parameter `outward_normal` is assumed to have unit length.
         self.front_face = Vec3.dot(r.direction(), outward_normal) < 0
-        if self.normal == self.front_face:
-            self.normal = -outward_normal
-        else: 
-            self.normal = outward_normal
+        self.normal = outward_normal if self.front_face else -outward_normal
 
 class Hittable(ABC):
     @abstractmethod
