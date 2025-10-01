@@ -5,23 +5,24 @@ from Ray import Ray
 from color import write_color
 import math
 import random
-
+import datetime
 class Camera:
 
   def __init__(self):
     self.aspect_ratio = 16.0 / 9.0 # Ratio of image width over height
-    self.image_width = 500 # Rendered image width in pixel count
-    self.samples_per_pixel = 50 # Count of random samples for each pixel
+    self.image_width = 1200 # Rendered image width in pixel count
+    self.samples_per_pixel = 25 # Count of random samples for each pixel
     self.pixel_samples_scale = 1.0 / self.samples_per_pixel # Divisor for averaging samples
-    self.max_depth = 50 # Maximum number of ray bounces into scene.  Keep below 48.
+    self.max_depth = 25 # Maximum number of ray bounces into scene. 
     self.vfov = 20 # Vertical view angle (field of view)
-    self.lookfrom = Point3(-2,2,1)#(13,2,3)
-    self.lookat = Point3(0, 0, -1)
+    self.lookfrom = Point3(72, 40, 72)
+    self.lookat = Point3(0, 0, 0)
     self.vup = Vec3(0, 1, 0)
-    self.defocus_angle = 0#0.6
+    self.defocus_angle = 0.0
     self.focus_dist = 10.0
 
   def render(self, file, world):
+    start = datetime.datetime.now()
     self.initialize()
     file.write("P3\n")
     txt = f"{self.image_width} {self.image_height}\n"
@@ -29,7 +30,13 @@ class Camera:
     file.write("255\n")
     for j in range(self.image_height):
       lines = self.image_height - j
-      txt = f"Scanlines remaining: {lines}"
+      now = datetime.datetime.now()
+      elapsed = now - start
+      ect = ((elapsed / max(j, 1)) * lines)
+      if j == 0:
+        txt = f"Scanlines remaining: {lines}."
+      else:
+        txt = f"Scanlines remaining: {lines}.  Estimated complete in appx {ect} hh:mm:ss."
       print(txt)
       for i in range(self.image_width):
         pixel_color = Vec3(0.0,0.0,0.0)
@@ -51,6 +58,7 @@ class Camera:
     unit_direction = Vec3.unit_vector(r.direction())
     a = 0.5 * (unit_direction.y() + 1.0)
     return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)
+    #return (1.0 - a) * Color(0.12, 0.12, 0.12) + a * Color(0.0, 0.2, 0.5)
 
   def get_ray(self, i, j):
     # Construct a camera ray originating from the origin and directed at randomly sampled
